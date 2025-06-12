@@ -227,38 +227,6 @@ else:
     # Save LaTeX figure
     fig1.savefig("pcm_radiator_hybrid_heatflux_during_flight.pdf", bbox_inches="tight")
 
-# # Plot the same again but zoomed in (maybe can be made dependent on first plot)
-# fig3, ax3 = plt.subplots(constrained_layout=True)
-
-# ax3.plot(x_values, Qdot_env, color='blue', linewidth=1, linestyle=(0, (1, 5)),
-#         label=r'$\dot{Q}_{\mathrm{Umwelt}}$')
-# ax3.plot(x_values, [Qdot_avionics]*len(x_values), color='orange', linewidth=1, linestyle='--',
-#         label=r'$\dot{Q}_{\mathrm{Avionik}}$')
-# ax3.plot(x_values, [phi_radiation_target]*len(x_values), color='red', linewidth=1, linestyle='--',
-#         label=r'$\dot{Q}_{\mathrm{Radiator}}$')
-# ax3.plot(x_values, Qdot_in, color='blue', linewidth=1, linestyle='-',
-#         label=r'$\dot{Q}_{\mathrm{Rein}}$')
-
-# ax3.fill_between(
-#     x_values, phi_radiation_target, Qdot_in,
-#     where=(Qdot_in > phi_radiation_target),
-#     facecolor='lightgrey',
-#     hatch='//',
-#     edgecolor='black',
-#     alpha=0.5,
-#     label='PCM\n Schmelzbereich'
-# )
-
-# # Labeling
-# ax3.set_xlabel('Zeit [s]')
-# ax3.set_ylabel(r'Wärmestrom [W]')
-# ax3.set_xlim(0,70)
-# if DEVELOPMENT_MODE:
-#     ax3.set_title("PCM Wärmestrom")
-# else:
-#     # Save LaTeX figure
-#     fig3.savefig("pcm_radiator_hybrid_heatflux_during_flight_zoomed.pdf", bbox_inches="tight")
-
 # Plot the Reynoldsnumber and Prandtlnumber
 fig2, ax2 = plt.subplots(constrained_layout=True)
 
