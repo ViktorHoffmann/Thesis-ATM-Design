@@ -1,0 +1,7 @@
+{
+    "devmode": 0,
+    "Qdot_avionics": 40,
+    "emittance": 0.91,
+    "absorptance": 0.15,
+    "trajectory_data_path": "blast.csv"
+}
