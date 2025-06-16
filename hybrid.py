@@ -100,13 +100,17 @@ mpl.rcParams.update({
 
 # === Equations ===
 eta_0 = 18.27e-6    # [Pa*s]
-T_0 = 291.15        # [L]
+T_0 = 291.15        # [K] reference temperature for sutherlands law
 C = 120             # [K]
 kappa = 1.4
 R = 287             # [J/(kg*K)]
 c_p = 1005          # [J/(kg*K)]
-x = 1               # [m] für lokale Nußeltzahl
+x = 1               # [m] for local evaluation
 T_w = 273.15+38     # [K] assumed constant at pcm melting point (icosane: 38°C)
+
+# average temperature
+def T_m(T1,T2):
+    return (T1+T2)/2
 
 # Sutherlands law
 def eta(T):
@@ -154,7 +158,7 @@ def qdot_air(p, T, V, x, T_w):
     return alpha * (Tr - T_w)  # [W/m²]
 
 Qdot_env = np.array([
-    qdot_air(p, T, V, x, T_w)
+    qdot_air(p, T_m(T_w, T), V, x, T_w)
     for p, T, V in zip(air_pressure, air_temperature, velocity)
 ]) * radiator_area_target + (500*a*radiator_area_target) # environment includes solar flux
 
@@ -198,7 +202,7 @@ ax1.fill_between(
 )
 
 # Inset axes (zoom region)
-x1, x2, y1, y2 = 0, 70, 0, 170  # adjust as needed
+x1, x2, y1, y2 = 0, 70, 0, 190 # adjust as needed
 axins = ax1.inset_axes([0.2, 0.47, 0.5, 0.5])
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
