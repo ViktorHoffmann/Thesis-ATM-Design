@@ -23,9 +23,11 @@ except json.JSONDecodeError:
     exit()
 
 DEVELOPMENT_MODE = data["devmode"]
-Qdot_avionics = data["Qdot_avionics"]
+avionics_power = data["avionics_power"] # W
 e = data["emittance"]
 a = data["absorptance"]
+solar_flux = data["solar_flux"] # W*m^-2
+target_temperature = data["target_temperature"]
 
 # Set global matplotlib style
 mpl.rcParams.update({
@@ -43,8 +45,7 @@ mpl.rcParams.update({
 
 # === Equations ===
 rho_alu = 2700 # kg/m^3
-T_target = 273.15+70 # target temperature
-factor = 1.5 # radiaton overhead factor
+T_target = 273.15+target_temperature # target temperature
 
 # Define temperature in Celsius for plotting, and convert to Kelvin
 temp_C = np.linspace(0, 100, 100) # °C
@@ -59,16 +60,16 @@ phi_radiation = (A_grid * e * Stefan_Boltzmann * T_K_grid**4) # [W]
 
 
 # === Target result ===
-radiator_area_target = (Qdot_avionics * factor) / (e * Stefan_Boltzmann * T_target**4) # [m^2]
-phi_radiation_target = radiator_area_target * e * Stefan_Boltzmann * T_target**4 # [W]
+hybrid_radiator_area = (avionics_power) / ((e * Stefan_Boltzmann * T_target**4)-(solar_flux/2)*a) # [m^2] necessary radiator area to get rid of avionics- and solarheatflux
+hybrid_radiator_power = hybrid_radiator_area*e*Stefan_Boltzmann*T_target**4 # [W] total out-heatflux of radiator
 
 # Putting Data into result.json
 with open("result.json", "w") as f:
     json.dump({}, f, indent=4)  # clear result.json as this is the first write in the programm chain
 
 data = {
-    "radiator_area_target": radiator_area_target,
-    "phi_radiation_target": phi_radiation_target
+    "hybrid_radiator_area": hybrid_radiator_area,
+    "hybrid_radiator_power": hybrid_radiator_power
 }
 
 with open("result.json", "w") as f:

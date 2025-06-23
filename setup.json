@@ -1,7 +1,9 @@
 {
-    "devmode": 0,
-    "Qdot_avionics": 40,
+    "devmode": 1,
+    "avionics_power": 40,
+    "target_temperature": 80,
     "emittance": 0.91,
     "absorptance": 0.15,
+    "solar_flux": 1000,
     "trajectory_data_path": "blast.csv"
 }
