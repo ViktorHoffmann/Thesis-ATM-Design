@@ -6,6 +6,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
 # === CONFIGURATION ===
 
@@ -139,8 +140,8 @@ ax1.fill_between(
 )
 
 # Inset zoom
-x1, x2, y1, y2 = 0, 70, 0, 220
-axins = ax1.inset_axes([0.2, 0.47, 0.5, 0.5])
+x1, x2, y1, y2 = 0, 80, 0, 215
+axins = ax1.inset_axes([0.2, 0.4, 0.5, 0.5])
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
 axins.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)))
@@ -155,6 +156,7 @@ axins.fill_between(
     edgecolor='black',
     alpha=0.5
 )
+mark_inset(ax1, axins, loc1=1, loc2=4, fc="none", ec="0.5")
 
 # Labels and output
 ax1.set_xlabel('Zeit [s]')

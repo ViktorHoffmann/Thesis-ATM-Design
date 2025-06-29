@@ -1,9 +1,9 @@
 {
-    "hybrid_radiator_area": 0.05497654355688855,
-    "hybrid_radiator_power": 44.123240766766635,
-    "pcm_capacity_target": 3749.5711072654417,
-    "hybrid_H_target": 0.00236775469824387,
-    "hybrid_m_target": 0.317261676815661,
+    "hybrid_radiator_area": 0.09788296526851513,
+    "hybrid_radiator_power": 47.34122239513864,
+    "pcm_capacity_target": 6755.851979226902,
+    "hybrid_H_target": 0.002370558777451428,
+    "hybrid_m_target": 0.564880405431423,
     "normal_L_solution": 0.06536678192822748,
     "normal_m_solution": 0.316270739362871
 }
