@@ -71,7 +71,7 @@ DEFINE_SOURCE(Boussinesq_momentum_source,cell,thread,dS,eqn)
 {
 	double Temp, source;
 	Temp=C_T(cell,thread);
-	source=Rol_pcm*9.81*TEC*(Temp-Tr);
-	dS[eqn]=Rol_pcm*9.81*TEC;
+	source=-Rol_pcm*9.81*TEC*(Temp-Tr);
+	dS[eqn]=-Rol_pcm*9.81*TEC;
 	return source;
 }
