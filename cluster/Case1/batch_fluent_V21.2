@@ -1,0 +1,127 @@
+#!/bin/sh
+
+# Skript for FLUENT
+# created: 09.02.2007 (chd)
+# changed: 09.02.2007 (chd)
+
+# Changelog:
+# 09.02.2007 Initial revision
+# 23.11.2010 modified to run on more than 4 processors (ssc)
+# 22.03.2011 modified to run FLUENT V13.0 (ssc)
+# 23.11.2017 modified to new PBS and FLUENT V18.0 (ss)
+
+# Usage:
+# qsub batch_fluent_V19
+
+# --- PBS options --------------------------------
+#PBS -q batch
+#PBS -l select=48:host=studcluster4:mem=3000mb
+#PBS -l walltime=48:00:00
+#PBS -m bea
+#PBS -M st177556@stud.uni-stuttgart.de
+# --- End PBS options ----------------------------
+
+# --- Customize ----------------------------------
+# SCRIPT       FLUENT script file
+# INFILES      Input files (*.cas.h5, *.dat.h5)
+# OUTFILES     Output files (*.dat.h5)
+# CASEDIR      Case directory below $HOME
+# REL          FLUENT release
+# VER          FLUENT version
+# FLUENT_ARCH  FLUENT architecture
+
+SCRIPT=SYS.1.jou
+INFILES="SYS.1.cas.h5 SYS.1.dat.h5"
+OUTPUT="SYS.1-result"
+OUTFILES="$OUTPUT.dat.h5"
+CASEDIR=/home/stcwa1/Fluent/Case1
+REL_LONG=2021R2
+REL=212
+VER=3ddp
+FLUENT_ARCH=lnamd64
+# --- End Customize ------------------------------
+
+NODES=`cat $PBS_NODEFILE`
+NODES=`echo $NODES | sed 's/ /,/g'`
+PBS_NUM_NODES=`uniq -c $PBS_NODEFILE | wc -l`
+
+echo "NODES: $NODES"
+echo "PBS_NUM_NODES $PBS_NUM_NODES"
+
+# --- First log entries -------------------------------------------------------
+set -e # exit on error
+startdate=`date +%s`
+echo "------------------------------------------------------------"
+echo "Job started at: `date '+%d/%m/%y %H:%M:%S'`"
+echo "------------------------------------------------------------"
+
+
+# --- Create SCRATCH directory on compute node (/scratch/user_PBS_JOBID) ------
+PROJECTDIR=$PBS_O_WORKDIR
+echo "Project directory: $PROJECTDIR"
+CASE=`basename $PBS_O_WORKDIR`
+SCRATCH=/scratch/`whoami`_$PBS_JOBID
+mkdir $SCRATCH
+
+# --- Link to scratch
+# NODE=`head -n1 $PBS_NODEFILE`
+# ln -s /scratch/$NODE/`whoami`_$PBS_JOBID $PROJECTDIR/scratch_$PBS_JOBID 2>&1
+# --- Link to scratch
+ln -s /scratch/$(hostname)/`whoami`_$PBS_JOBID $PROJECTDIR/scratch_$PBS_JOBID 2>&1
+
+
+# --- Set environment variables -----------------------------------------------
+SOLVERDIR=`ls -d /sw/ANSYS$REL_LONG/ansys_inc/v$REL/fluent/bin`
+export PATH=$PATH:$SOLVERDIR
+export $FLUENT_ARCH
+#export DISPLAY=localhost:0
+
+# --- Copy to scratch ---------------------------------------------------------
+cd $SCRATCH 2>&1
+echo "Copy data from project to scratch:"
+set +e
+for i in $INFILES $SCRIPT;
+do
+    echo "Copying $i..."
+    /bin/cp $PROJECTDIR/$i $SCRATCH/. > /dev/null 2>&1
+    if [ ! -f "$SCRATCH/$i" ]; then
+      enddate=`date '+%d/%m/%y %H:%M:%S'`
+      echo "------------------------------------------------------------"
+      echo
+      echo " Copying file $i failed!"
+      echo " Job ended at:" $enddate
+      echo
+      echo "------------------------------------------------------------"
+      exit 1
+    fi;
+done
+set -e
+
+echo "PBS_NP $PBS_NP"
+
+# --- start calculation
+
+set +e
+fluent $VER -t$PBS_NUM_NODES -g -i $SCRIPT > $OUTPUT
+set -e
+
+
+
+
+# --- Copy results back to project --------------------------------------------
+echo "Calculation finished."
+echo "Copy results back to project directory..."
+/bin/cp -r $OUTFILES $PROJECTDIR/. > /dev/null 2>&1
+set -e
+
+# --- Clean up ----------------------------------------------------------------
+/bin/rm -rf $SCRATCH 2>&1
+
+# --- Final log entries -------------------------------------------------------
+enddate=`date +%s`
+echo "------------------------------------------------------------"
+echo "Job ended at: `date '+%d/%m/%y %H:%M:%S'`"
+echo "Runtime: $((enddate-startdate)) s."
+echo "------------------------------------------------------------"
+
+exit 0

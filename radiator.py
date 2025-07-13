@@ -1,6 +1,4 @@
 # This Program calculates the steady-state equation for a grey body radiator
-# 
-# setup.json: devmode, Qdot_avonics ---> radiator.py: radiator_area ---> result.json
 
 import numpy as np
 import json

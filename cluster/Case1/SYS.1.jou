@@ -1,0 +1,7 @@
+/file/read-case-data SYS.1.cas.h5
+/file/read-data SYS.1-0.00.dat.h5
+/solve/set/time-step 0.01
+/solve/dual-time-iterate 140000 50
+/file/write-data SYS.1-result.dat.h5
+/exit
+yes
