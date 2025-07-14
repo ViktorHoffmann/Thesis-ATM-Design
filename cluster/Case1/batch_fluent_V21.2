@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Skript for FLUENT
 # created: 09.02.2007 (chd)
@@ -9,13 +9,15 @@
 # 23.11.2010 modified to run on more than 4 processors (ssc)
 # 22.03.2011 modified to run FLUENT V13.0 (ssc)
 # 23.11.2017 modified to new PBS and FLUENT V18.0 (ss)
+# 14.07.2025 modified to run with Fluent UDF
 
 # Usage:
-# qsub batch_fluent_V19
+# if edited on windows run: dos2unix batch_fluent_V21.2
+# qsub batch_fluent_V21.2
 
 # --- PBS options --------------------------------
 #PBS -q batch
-#PBS -l select=48:host=studcluster4:mem=3000mb
+#PBS -l select=48:host=studcluster4:mem=2000mb
 #PBS -l walltime=48:00:00
 #PBS -m bea
 #PBS -M st177556@stud.uni-stuttgart.de
@@ -31,10 +33,10 @@
 # FLUENT_ARCH  FLUENT architecture
 
 SCRIPT=SYS.1.jou
-INFILES="SYS.1.cas.h5 SYS.1.dat.h5"
+INFILES="SYS.1.cas.h5 SYS.1.dat.h5 icosane_pcm.c"
 OUTPUT="SYS.1-result"
 OUTFILES="$OUTPUT.dat.h5"
-CASEDIR=/home/stcwa1/Fluent/Case1
+# CASEDIR=/home/stcwa1/Fluent/Case1
 REL_LONG=2021R2
 REL=212
 VER=3ddp
@@ -83,7 +85,7 @@ set +e
 for i in $INFILES $SCRIPT;
 do
     echo "Copying $i..."
-    /bin/cp $PROJECTDIR/$i $SCRATCH/. > /dev/null 2>&1
+    /bin/cp $PROJECTDIR/$i $SCRATCH/.
     if [ ! -f "$SCRATCH/$i" ]; then
       enddate=`date '+%d/%m/%y %H:%M:%S'`
       echo "------------------------------------------------------------"
