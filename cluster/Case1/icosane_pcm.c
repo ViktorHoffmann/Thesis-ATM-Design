@@ -27,24 +27,28 @@
 DEFINE_PROPERTY(Ro_var_PCM,cell,thread)
 {
 	double Gama, Ro_pcm;
-	Gama=C_LIQF(cell,thread);
-	Ro_pcm=(1-Gama)*Ros_pcm+Gama*Rol_pcm;
+	#if !RP_HOST
+		Gama=C_LIQF(cell,thread);
+		Ro_pcm=(1-Gama)*Ros_pcm+Gama*Rol_pcm;
+	#endif
 	return Ro_pcm;
 }
 
 DEFINE_SPECIFIC_HEAT(Cp_var_PCM,T,Tref,h,yi)
 {
 	double Gama, Cp_pcm;
-	if (T<Ts) { Cp_pcm=Cps_pcm; } else if (T>=Ts&&T<=Tl)
-	{
-		Gama=(T-Ts)/(Tl-Ts);
-		Cp_pcm=((1-Gama)*Ros_pcm*Cps_pcm+Gama*Rol_pcm*Cpl_pcm)/((1-Gama)*Ros_pcm+Gama*Rol_pcm);
-	}
-	else
-	{
-		Cp_pcm=Cpl_pcm;
-	}
-	*h=Cp_pcm*(T-Tref);
+	#if !RP_HOST
+		if (T<Ts) { Cp_pcm=Cps_pcm; } else if (T>=Ts&&T<=Tl)
+		{
+			Gama=(T-Ts)/(Tl-Ts);
+			Cp_pcm=((1-Gama)*Ros_pcm*Cps_pcm+Gama*Rol_pcm*Cpl_pcm)/((1-Gama)*Ros_pcm+Gama*Rol_pcm);
+		}
+		else
+		{
+			Cp_pcm=Cpl_pcm;
+		}
+		*h=Cp_pcm*(T-Tref);
+	#endif
 	return Cp_pcm;
 }
 
@@ -52,8 +56,10 @@ DEFINE_SPECIFIC_HEAT(Cp_var_PCM,T,Tref,h,yi)
 DEFINE_PROPERTY(K_var_PCM,cell,thread)
 {
 	double Gama, K_pcm;
-	Gama=C_LIQF(cell,thread);
-	K_pcm=(1-Gama)*Ks_pcm+Gama*Kl_pcm;
+	#if !RP_HOST
+		Gama=C_LIQF(cell,thread);
+		K_pcm=(1-Gama)*Ks_pcm+Gama*Kl_pcm;
+	#endif
 	return K_pcm;
 }
 
@@ -61,8 +67,10 @@ DEFINE_PROPERTY(K_var_PCM,cell,thread)
 DEFINE_PROPERTY(Mu_var_PCM,cell,thread)
 {
 	double Temp,Mu_pcm;
-	Temp=C_T(cell,thread);
-	Mu_pcm=(9*pow(10.,-4)*pow(Temp,2)-0.6529*Temp+119.94)*pow(10.,-3);
+	#if !RP_HOST
+		Temp=C_T(cell,thread);
+		Mu_pcm=(9*pow(10.,-4)*pow(Temp,2)-0.6529*Temp+119.94)*pow(10.,-3);
+	#endif
 	return Mu_pcm;
 }
 

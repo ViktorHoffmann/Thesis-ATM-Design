@@ -1,7 +1,6 @@
 /file/read-case-data SYS.1.cas.h5
-/define/user-defined/compiled-functions compile yes icosane_pcm.c
-/define/user-defined/compiled-functions load "libudf"
 /file/read-data SYS.1.dat.h5
+/define/user-defined/compiled-functions compile "libudf" yes "icosane_pcm.c" "" "" /define/user-defined/compiled-functions load libudf
 /solve/set/time-step 0.01
 /solve/dual-time-iterate 140000 50
 /file/write-data SYS.1-result.dat.h5

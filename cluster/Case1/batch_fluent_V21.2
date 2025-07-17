@@ -12,12 +12,12 @@
 # 14.07.2025 modified to run with Fluent UDF
 
 # Usage:
-# if edited on windows run: dos2unix batch_fluent_V21.2
+# if edited on windows run: dos2unix batch_fluent_V21.2 "udf_filename".c
 # qsub batch_fluent_V21.2
 
 # --- PBS options --------------------------------
 #PBS -q batch
-#PBS -l select=48:host=studcluster4:mem=2000mb
+#PBS -l select=48:host=studcluster4:mem=2580mb
 #PBS -l walltime=48:00:00
 #PBS -m bea
 #PBS -M st177556@stud.uni-stuttgart.de
@@ -25,7 +25,7 @@
 
 # --- Customize ----------------------------------
 # SCRIPT       FLUENT script file
-# INFILES      Input files (*.cas.h5, *.dat.h5)
+# INFILES      Input files (*.cas.h5, *.dat.h5, *.c)
 # OUTFILES     Output files (*.dat.h5)
 # CASEDIR      Case directory below $HOME
 # REL          FLUENT release
