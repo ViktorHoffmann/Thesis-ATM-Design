@@ -188,6 +188,12 @@ ax2.set_xlim(0, 200)
 
 if DEVELOPMENT_MODE:
     ax2.set_title("Reynolds- und Prandtl-Zahl während kritischer Phase im Flug")
+    Re_plot_clean = np.ma.masked_invalid(Re_plot)
+    # Get max value and index
+    max_index = np.ma.argmax(Re_plot_clean)
+    max_value = Re_plot[max_index]
+    max_x = x_values[max_index]
+    print(f"Maximum Reynolds number: {max_value} at x = {max_x}")
 else:
     fig2.savefig("re_pr_during_flight.pdf", bbox_inches="tight")
 
