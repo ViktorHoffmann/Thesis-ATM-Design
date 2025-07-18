@@ -64,7 +64,7 @@ if missing_fields:
 time = raw['time']  # [s]
 velocity = raw['velocity']  # [m/s]
 air_temperature = raw['air_temperature'] + 273.15  # [K]
-air_pressure = raw['air_pressure']  # [Pa]
+air_pressure = raw['air_pressure'] * 100 # [Pa]
 
 # === MATPLOTLIB STYLE ===
 mpl.rcParams.update({
@@ -101,7 +101,7 @@ def T_r(V, T): return T * (1 + r(T) * (kappa + 1) / 2 * Ma(V, T))
 def qdot_air(p, T, V, x, T_w):
     Re_x = Re(V, p, T, x)
     Pr_x = Pr(T)
-    Nu_x = 0.332 * Re_x**0.5 * Pr_x**(1/3)
+    Nu_x = 0.0296 * Re_x**0.8 * Pr_x**(1/3)
     alpha = Nu_x * lam(T) / x
     return alpha * (T_r(V, T) - T_w)
 
@@ -140,7 +140,7 @@ ax1.fill_between(
 )
 
 # Inset zoom
-x1, x2, y1, y2 = 0, 80, 0, 215
+x1, x2, y1, y2 = 0, 100, 0, 150
 axins = ax1.inset_axes([0.2, 0.4, 0.5, 0.5])
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
@@ -156,7 +156,7 @@ axins.fill_between(
     edgecolor='black',
     alpha=0.5
 )
-mark_inset(ax1, axins, loc1=1, loc2=4, fc="none", ec="0.5")
+mark_inset(ax1, axins, loc1=2, loc2=4, fc="none", ec="0.5")
 
 # Labels and output
 ax1.set_xlabel('Zeit [s]')
@@ -200,10 +200,13 @@ else:
 # === CALCULATE PCM CAPACITY REQUIREMENT ===
 mask = Qdot_in > hybrid_radiator_power
 x_limits = x_values[mask]
-y_diff = Qdot_in[mask] - hybrid_radiator_power
-pcm_capacity_target = np.trapezoid(y_diff, x_limits)  # Energy integral [J]
+y_diff_hybrid = Qdot_in[mask] - hybrid_radiator_power
+y_diff_pcm = avionics_power
+hybrid_capacity_target = np.trapezoid(y_diff_hybrid, x_limits)  # hybrid Energy integral [J]
+pcm_capacity_target = avionics_power * 1400 # normal pcm energy requirement
 
 # Append result
+result_data["hybrid_capacity_target"] = hybrid_capacity_target
 result_data["pcm_capacity_target"] = pcm_capacity_target
 with open("result.json", "w") as f:
     json.dump(result_data, f, indent=4)

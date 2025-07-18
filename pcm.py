@@ -18,7 +18,7 @@ result = load_json("result.json")
 
 DEVELOPMENT_MODE = setup["devmode"]
 avionics_power = setup["avionics_power"]
-pcm_capacity_target = result["pcm_capacity_target"]
+hybrid_capacity_target = result["hybrid_capacity_target"]
 L_target = np.sqrt(result["hybrid_radiator_area"])
 
 # Set global matplotlib style
@@ -76,7 +76,7 @@ plot_contour(L_vals, H_vals, Q_ges, "PCM Wärmekapazität nach Länge und Höhe"
 # === SOLUTION CALCULATION ===
 def solve_hybrid_H():
     H = Symbol('H')
-    eq = total_heat(L_target, H) - pcm_capacity_target
+    eq = total_heat(L_target, H) - hybrid_capacity_target
     return solve(eq, H)[0]
 
 def solve_mass(L, H):
