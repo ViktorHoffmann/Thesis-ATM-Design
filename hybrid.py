@@ -84,7 +84,7 @@ C = 120           # [K]
 kappa = 1.4
 R = 287           # [J/(kg·K)]
 c_p = 1005        # [J/(kg·K)]
-x = 1.25          # [m]
+x = 1.07 # [m]
 T_w = 273.15 + target_temperature # [K] PCM melting point (icosane: 38°C)
 
 # === THERMOPHYSICAL FUNCTIONS ===
