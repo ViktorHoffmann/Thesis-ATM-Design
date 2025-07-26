@@ -1,6 +1,5 @@
 # This Program calculates the transient equation of a radiator-pcm hybrid for the required pcm capacity
-#
-# setup.json: devmode, specificheatflux_environment, flight_duration ---> hybrid.py: pcm_capacity ---> result.json
+# it additionally plots Re, Pr and dynamic pressure for given flight data
 
 import numpy as np
 import json
@@ -85,25 +84,26 @@ C = 120           # [K]
 kappa = 1.4
 R = 287           # [J/(kg·K)]
 c_p = 1005        # [J/(kg·K)]
-x = 1.25             # [m]
+x = 1.25          # [m]
 T_w = 273.15 + target_temperature # [K] PCM melting point (icosane: 38°C)
 
 # === THERMOPHYSICAL FUNCTIONS ===
-def T_m(T1, T2): return (T1 + T2) / 2
-def eta(T): return eta_0 * ((T_0 + C) / (T + C)) * (T / T_0) ** (3/2)
-def lam(T): return 2.64638e-3 + 7.326e-5 * T - 1.746e-8 * T**2
-def rho(p, T): return p / (R * T)
-def Pr(T): return (c_p * eta(T)) / lam(T)
-def Ma(V, T): return V / np.sqrt(kappa * R * T)
-def Re(V, p, T, x): return V * rho(p, T) * x / eta(T)
-def r(T): return Pr(T) ** (1/3)
-def T_r(V, T): return T * (1 + r(T) * (kappa + 1) / 2 * Ma(V, T))
-def qdot_air(p, T, V, x, T_w):
+def T_m(T1, T2): return (T1 + T2) / 2                                   # average temperature
+def eta(T): return eta_0 * ((T_0 + C) / (T + C)) * (T / T_0) ** (3/2)   # dynamic viscosity with surherlands formula
+def lam(T): return 2.64638e-3 + 7.326e-5 * T - 1.746e-8 * T**2          # thermal conductivity with polynomial fit
+def rho(p, T): return p / (R * T)                                       # air density
+def Pr(T): return (c_p * eta(T)) / lam(T)                               # prandtl number
+def Ma(V, T): return V / np.sqrt(kappa * R * T)                         # mach number
+def Re(V, p, T, x): return V * rho(p, T) * x / eta(T)                   # reynolds number
+def r(T): return Pr(T) ** (1/3)                                         # recovery factor
+def T_r(V, T): return T * (1 + r(T) * (kappa + 1) / 2 * Ma(V, T))       # recovery temperature
+def qdot_air(p, T, V, x, T_w):                                          # nusselt relation for wall heatflux
     Re_x = Re(V, p, T, x)
     Pr_x = Pr(T)
     Nu_x = 0.0296 * Re_x**0.8 * Pr_x**(1/3)
     alpha = Nu_x * lam(T) / x
     return alpha * (T_r(V, T) - T_w)
+def pdyn(V, T, p): return 0.5 * rho(p, T) * V**2                        # dynamic pressure
 
 # === HEATFLUX CALCULATION ===
 Qdot_env = np.array([
@@ -116,6 +116,7 @@ Qdot_in = Qdot_env + avionics_power  # [W]
 # === FLUID DYNAMICS PLOTS ===
 Re_plot = np.array([Re(V, p, T, x) for V, p, T in zip(velocity, air_pressure, air_temperature)])
 Pr_plot = np.array([Pr(T) for T in air_temperature])
+pdyn_plot = np.array([pdyn(V, T, p) for V, p, T in zip(velocity, air_pressure, air_temperature)])
 
 # === PLOTTING HEATFLUX ===
 x_values = time
@@ -184,7 +185,7 @@ ax2b.tick_params(axis='y')
 lines, labels = ax2.get_legend_handles_labels()
 lines2, labels2 = ax2b.get_legend_handles_labels()
 ax2.legend(lines + lines2, labels + labels2, loc='upper right')
-ax2.set_xlim(0, 200)
+ax2.set_xlim(0, 150)
 
 if DEVELOPMENT_MODE:
     ax2.set_title("Reynolds- und Prandtl-Zahl während kritischer Phase im Flug")
@@ -197,13 +198,32 @@ if DEVELOPMENT_MODE:
 else:
     fig2.savefig("re_pr_during_flight.pdf", bbox_inches="tight")
 
+# === PLOTTING DYNAMIC PRESSURE ===
+fig3, ax3 = plt.subplots(constrained_layout=True)
+ax3.plot(x_values, pdyn_plot, color='black', label='Dynamischer Druck')
+ax3.set_xlabel('Zeit [s]')
+ax3.set_ylabel(r'Dynamischer Druck [Pa]')
+ax3.tick_params(axis='y')
+ax3.set_xlim(0, 150)
+
+if DEVELOPMENT_MODE:
+    ax3.set_title("Dynamischer Druck während kritischer Phase im Flug")
+    dynp_plot_clean = np.ma.masked_invalid(pdyn_plot)
+    # Get max value and index
+    max_index = np.ma.argmax(dynp_plot_clean)
+    max_value = pdyn_plot[max_index]
+    max_x = x_values[max_index]
+    print(f"Maximum Dynamic Pressure: {max_value} at x = {max_x}")
+else:
+    fig2.savefig("dynp_during_flight.pdf", bbox_inches="tight")
+
 # === CALCULATE PCM CAPACITY REQUIREMENT ===
 mask = Qdot_in > hybrid_radiator_power
 x_limits = x_values[mask]
 y_diff_hybrid = Qdot_in[mask] - hybrid_radiator_power
 y_diff_pcm = avionics_power
 hybrid_capacity_target = np.trapezoid(y_diff_hybrid, x_limits)  # hybrid Energy integral [J]
-pcm_capacity_target = avionics_power * 1400 # normal pcm energy requirement
+pcm_capacity_target = avionics_power * 1400                     # normal pcm energy requirement
 
 # Append result
 result_data["hybrid_capacity_target"] = hybrid_capacity_target
