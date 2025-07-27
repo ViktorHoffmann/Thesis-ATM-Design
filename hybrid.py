@@ -84,7 +84,7 @@ C = 120           # [K]
 kappa = 1.4
 R = 287           # [J/(kg·K)]
 c_p = 1005        # [J/(kg·K)]
-x = 1.07 # [m]
+x = 1.07          # [m] radiator centerpoint (0.06 m from hull top)
 T_w = 273.15 + target_temperature # [K] PCM melting point (icosane: 38°C)
 
 # === THERMOPHYSICAL FUNCTIONS ===
@@ -100,7 +100,7 @@ def T_r(V, T): return T * (1 + r(T) * (kappa + 1) / 2 * Ma(V, T))       # recove
 def qdot_air(p, T, V, x, T_w):                                          # nusselt relation for wall heatflux
     Re_x = Re(V, p, T, x)
     Pr_x = Pr(T)
-    Nu_x = 0.0296 * Re_x**0.8 * Pr_x**(1/3)
+    Nu_x = 0.0296 * Re_x**0.8 * Pr_x**(1/3) # turbulent
     alpha = Nu_x * lam(T) / x
     return alpha * (T_r(V, T) - T_w)
 def pdyn(V, T, p): return 0.5 * rho(p, T) * V**2                        # dynamic pressure
