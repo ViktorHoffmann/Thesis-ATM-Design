@@ -56,12 +56,12 @@ x_values = position
 
 fig1, ax1 = plt.subplots(constrained_layout=True)
 
-ax1.plot(x_values, maxQHeatflux, color='blue', linestyle='-', label=r'$\dot{q}_{\mathrm{maxQ}}$')
-ax1.plot(x_values, maxQm1Heatflux, color='green', linestyle='-', label=r'$\dot{q}_{\mathrm{maxQ-1}}$')
-ax1.plot(x_values, maxQp1Heatflux, color='red', linestyle='-', label=r'$\dot{q}_{\mathrm{maxQ+1}}$')
+ax1.plot(x_values, maxQHeatflux, color='dimgray', linestyle='-', label=r'$\dot{q}_{\mathrm{maxQ}}$')
+ax1.plot(x_values, maxQm1Heatflux, color='black', linestyle='-', label=r'$\dot{q}_{\mathrm{maxQ-1}}$')
+ax1.plot(x_values, maxQp1Heatflux, color='darkgray', linestyle='-', label=r'$\dot{q}_{\mathrm{maxQ+1}}$')
 
 ax1.set_xlabel('Position [m]')
-ax1.set_ylabel(r'Spezifischer Wärmestrom [W]')
+ax1.set_ylabel(r'Spezifischer Wärmestrom [$W/m^2$]')
 ax1.legend()
 if DEVELOPMENT_MODE:
     ax1.set_title("spezifischer Wärmestrom Hülle")
