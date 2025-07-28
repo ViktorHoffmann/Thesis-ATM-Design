@@ -121,6 +121,20 @@ pdyn_plot = np.array([pdyn(V, T, p) for V, p, T in zip(velocity, air_pressure, a
 # === PLOTTING HEATFLUX ===
 x_values = time
 
+# normalize Qdot_in to Simulation values
+target_x = 28.691
+target_y = 80206.9 * hybrid_radiator_area
+
+# Index des Zeitpunkts finden, der am nächsten zu target_x liegt
+idx_target = np.argmin(np.abs(x_values - target_x))
+actual_y = Qdot_in[idx_target]
+
+# Skalierungsfaktor berechnen
+scale_factor = target_y / actual_y
+
+# Normierte Funktion berechnen
+Qdot_in_norm = Qdot_in * scale_factor
+
 fig1, ax1 = plt.subplots(constrained_layout=True)
 
 # Main heat flow curves
@@ -128,7 +142,10 @@ ax1.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)), label=r'$\dot{
 ax1.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='--', label=r'$\dot{Q}_{\mathrm{Avionik}}$')
 ax1.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--', label=r'$\dot{Q}_{\mathrm{Radiator}}$')
 ax1.plot(x_values, Qdot_in, color='blue', linestyle='-', label=r'$\dot{Q}_{\mathrm{Rein}}$')
-
+ax1.plot(28.691, (80206.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
+ax1.plot(27.691, (77725*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-1}}$')
+ax1.plot(29.691, (71151.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+1}}$')
+ax1.plot(x_values, Qdot_in_norm, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, normiert}}$')
 # PCM melting range
 ax1.fill_between(
     x_values, hybrid_radiator_power, Qdot_in,
@@ -141,7 +158,7 @@ ax1.fill_between(
 )
 
 # Inset zoom
-x1, x2, y1, y2 = 0, 100, 0, 150
+x1, x2, y1, y2 = 0, 60, 6500, 8500
 axins = ax1.inset_axes([0.2, 0.4, 0.5, 0.5])
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
@@ -149,6 +166,10 @@ axins.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)))
 axins.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='--')
 axins.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--')
 axins.plot(x_values, Qdot_in, color='blue', linestyle='-')
+axins.plot(28.691, (80206.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
+axins.plot(27.691, (77725*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-1}}$')
+axins.plot(29.691, (71151.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+1}}$')
+axins.plot(x_values, Qdot_in_norm, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, normiert}}$')
 axins.fill_between(
     x_values, hybrid_radiator_power, Qdot_in,
     where=(Qdot_in > hybrid_radiator_power),
@@ -218,9 +239,9 @@ else:
     fig2.savefig("dynp_during_flight.pdf", bbox_inches="tight")
 
 # === CALCULATE PCM CAPACITY REQUIREMENT ===
-mask = Qdot_in > hybrid_radiator_power
+mask = Qdot_in_norm > hybrid_radiator_power #SIM RESULT
 x_limits = x_values[mask]
-y_diff_hybrid = Qdot_in[mask] - hybrid_radiator_power
+y_diff_hybrid = Qdot_in_norm[mask] - hybrid_radiator_power
 y_diff_pcm = avionics_power
 hybrid_capacity_target = np.trapezoid(y_diff_hybrid, x_limits)  # hybrid Energy integral [J]
 pcm_capacity_target = avionics_power * 1400                     # normal pcm energy requirement

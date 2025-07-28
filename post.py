@@ -54,6 +54,7 @@ mpl.rcParams.update({
 
 x_values = position
 
+# maxQ plots with 1 second before and behind
 fig1, ax1 = plt.subplots(constrained_layout=True)
 
 ax1.plot(x_values, maxQHeatflux, color='dimgray', linestyle='-', label=r'$\dot{q}_{\mathrm{maxQ}}$')
@@ -66,7 +67,7 @@ ax1.legend()
 if DEVELOPMENT_MODE:
     ax1.set_title("spezifischer Wärmestrom Hülle")
 else:
-    fig1.savefig("maxQ_compare_specific_heatflux.pdf", bbox_inches="tight")
+    fig1.savefig("maxQ_compare_heatflux.pdf", bbox_inches="tight")
 
 if DEVELOPMENT_MODE:
     plt.show()
