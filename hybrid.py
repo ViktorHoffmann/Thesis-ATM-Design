@@ -123,7 +123,7 @@ x_values = time
 
 # normalize Qdot_in to Simulation values
 target_x = 28.691
-target_y = 80206.9 * hybrid_radiator_area
+target_y = 67706.8 * hybrid_radiator_area
 
 # Index des Zeitpunkts finden, der am nächsten zu target_x liegt
 idx_target = np.argmin(np.abs(x_values - target_x))
@@ -142,9 +142,7 @@ ax1.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)), label=r'$\dot{
 ax1.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='--', label=r'$\dot{Q}_{\mathrm{Avionik}}$')
 ax1.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--', label=r'$\dot{Q}_{\mathrm{Radiator}}$')
 ax1.plot(x_values, Qdot_in, color='blue', linestyle='-', label=r'$\dot{Q}_{\mathrm{Rein}}$')
-ax1.plot(28.691, (80206.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
-ax1.plot(27.691, (77725*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-1}}$')
-ax1.plot(29.691, (71151.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+1}}$')
+ax1.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
 ax1.plot(x_values, Qdot_in_norm, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, normiert}}$')
 # PCM melting range
 ax1.fill_between(
@@ -166,9 +164,7 @@ axins.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)))
 axins.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='--')
 axins.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--')
 axins.plot(x_values, Qdot_in, color='blue', linestyle='-')
-axins.plot(28.691, (80206.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
-axins.plot(27.691, (77725*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-1}}$')
-axins.plot(29.691, (71151.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+1}}$')
+axins.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
 axins.plot(x_values, Qdot_in_norm, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, normiert}}$')
 axins.fill_between(
     x_values, hybrid_radiator_power, Qdot_in,
