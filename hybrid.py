@@ -6,6 +6,7 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+from scipy.optimize import curve_fit
 
 # === CONFIGURATION ===
 
@@ -121,19 +122,28 @@ pdyn_plot = np.array([pdyn(V, T, p) for V, p, T in zip(velocity, air_pressure, a
 # === PLOTTING HEATFLUX ===
 x_values = time
 
-# normalize Qdot_in to Simulation values
-target_x = 28.691
-target_y = 67706.8 * hybrid_radiator_area
+gauss_x = np.array([18.691, 28.691, 38.691, 48.7])  # seconds
+gauss_y = np.array([
+    34567.9 * hybrid_radiator_area,
+    67706.8 * hybrid_radiator_area,
+    72349.2 * hybrid_radiator_area,
+    21479.6 * hybrid_radiator_area
+])  # W
 
-# Index des Zeitpunkts finden, der am nächsten zu target_x liegt
-idx_target = np.argmin(np.abs(x_values - target_x))
-actual_y = Qdot_in[idx_target]
+# Gaussian function
+def gaussian(x, a, b, c, d):
+    return a * np.exp(-((x - b)**2) / (2 * c**2)) + d
 
-# Skalierungsfaktor berechnen
-scale_factor = target_y / actual_y
+# Initial guess: [amplitude, mean, stddev, offset]
+guess = [np.max(gauss_y), gauss_x[np.argmax(gauss_y)], 10, np.min(gauss_y)]
 
-# Normierte Funktion berechnen
-Qdot_in_norm = Qdot_in * scale_factor
+# Fit Gaussian to 4 points
+popt, _ = curve_fit(gaussian, gauss_x, gauss_y, p0=guess)
+
+# Generate smooth curve
+gauss_fitted_raw = gaussian(x_values, *popt)
+gauss_fitted = np.clip(gauss_fitted_raw, 0, None)  # Force values >= 0
+
 
 fig1, ax1 = plt.subplots(constrained_layout=True)
 
@@ -143,7 +153,11 @@ ax1.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='
 ax1.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--', label=r'$\dot{Q}_{\mathrm{Radiator}}$')
 ax1.plot(x_values, Qdot_in, color='blue', linestyle='-', label=r'$\dot{Q}_{\mathrm{Rein}}$')
 ax1.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
-ax1.plot(x_values, Qdot_in_norm, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, normiert}}$')
+ax1.plot(18.691, (34567.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-10s}}$')
+ax1.plot(38.691, (72349.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+10s}}$')
+ax1.plot(48.7, (21479.6*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+20s}}$')
+ax1.plot(x_values, gauss_fitted, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, Gauss-Fit}}$')
+
 # PCM melting range
 ax1.fill_between(
     x_values, hybrid_radiator_power, Qdot_in,
@@ -156,7 +170,7 @@ ax1.fill_between(
 )
 
 # Inset zoom
-x1, x2, y1, y2 = 0, 60, 6500, 8500
+x1, x2, y1, y2 = 0, 60, 0, 7500
 axins = ax1.inset_axes([0.2, 0.4, 0.5, 0.5])
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
@@ -165,7 +179,11 @@ axins.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle
 axins.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--')
 axins.plot(x_values, Qdot_in, color='blue', linestyle='-')
 axins.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
-axins.plot(x_values, Qdot_in_norm, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, normiert}}$')
+axins.plot(18.691, (34567.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-10s}}$')
+axins.plot(38.691, (72349.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+10s}}$')
+axins.plot(48.7, (21479.6*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+20s}}$')
+axins.plot(x_values, gauss_fitted, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, Gauss-Fit}}$')
+
 axins.fill_between(
     x_values, hybrid_radiator_power, Qdot_in,
     where=(Qdot_in > hybrid_radiator_power),
@@ -182,6 +200,7 @@ ax1.set_ylabel(r'Wärmestrom [W]')
 ax1.legend()
 if DEVELOPMENT_MODE:
     ax1.set_title("PCM Wärmestrom")
+    print(f"Fitted Gaussian parameters:\na={popt[0]:.2f}, b={popt[1]:.2f}, c={popt[2]:.2f}, d={popt[3]:.2f}")
 else:
     fig1.savefig("pcm_radiator_hybrid_heatflux_during_flight.pdf", bbox_inches="tight")
 
@@ -235,9 +254,9 @@ else:
     fig2.savefig("dynp_during_flight.pdf", bbox_inches="tight")
 
 # === CALCULATE PCM CAPACITY REQUIREMENT ===
-mask = Qdot_in_norm > hybrid_radiator_power #SIM RESULT
+mask = gauss_fitted > hybrid_radiator_power
+y_diff_hybrid = gauss_fitted[mask] - hybrid_radiator_power
 x_limits = x_values[mask]
-y_diff_hybrid = Qdot_in_norm[mask] - hybrid_radiator_power
 y_diff_pcm = avionics_power
 hybrid_capacity_target = np.trapezoid(y_diff_hybrid, x_limits)  # hybrid Energy integral [J]
 pcm_capacity_target = avionics_power * 1400                     # normal pcm energy requirement

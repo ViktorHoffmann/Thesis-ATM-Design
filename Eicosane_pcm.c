@@ -1,26 +1,26 @@
+//Modified UDF of the original source: https://akamcae.com/tutorials/phase-change-material-simulation-in-ansys-fluent/
 #include "udf.h"
 #include "mem.h"
 
 //n-eicosane constant properties in solid phase
-#define Ros_pcm 910.0
-#define Cps_pcm 1926.0
-#define Ks_pcm 0.423
+#define Ros_pcm 910.0 //Nazarychev-2022
+#define Cps_pcm 2132.4 //NIST
+#define Ks_pcm 0.4248 //Stryker-1990
 
 //n-eicosane constant properties in fluid phase
-#define Rol_pcm 769.0
-#define Cpl_pcm 2400.0
-#define Kl_pcm 0.146
+#define Rol_pcm 769.0 //Nazarychev-2022
+#define Cpl_pcm 2350.05 //NIST
+#define Kl_pcm 0.1505 //Benbrika-2020
 
 //thermal expansion coefficient
-#define TEC 0.0008161
+#define TEC 0.0009 //Benbrika-2020
 
 //solidus and liquidus temperatures of n-eicosane
-#define Ts 309.15
-#define Tl 311.15
+#define Ts 309.0 //NIST
+#define Tl 311.0 //NIST
 
 //reference temperature for Boussinesq's approximation
-#define Tr 310.15 //please select based on your problem
-
+#define Tr 310.0
 //please set the Tref in Fluent like Tr
 
 //density of PCM
