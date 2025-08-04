@@ -1,5 +1,5 @@
 #define NUM_POINTS 7407
-real acc_profile[NUM_POINTS][2] = {
+double acc_profile[NUM_POINTS][2] = {
     {0.000, 9.810},
     {0.010, 9.810},
     {0.020, 9.810},
