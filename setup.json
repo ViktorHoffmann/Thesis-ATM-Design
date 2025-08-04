@@ -1,5 +1,5 @@
 {
-    "devmode": 1,
+    "devmode": 0,
     "avionics_power": 40,
     "target_temperature": 38,
     "emittance": 0.91,

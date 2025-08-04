@@ -144,19 +144,59 @@ popt, _ = curve_fit(gaussian, gauss_x, gauss_y, p0=guess)
 gauss_fitted_raw = gaussian(x_values, *popt)
 gauss_fitted = np.clip(gauss_fitted_raw, 0, None)  # Force values >= 0
 
+# Main heat flow curves
+fig1a, ax1a = plt.subplots(constrained_layout=True)
+ax1a.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)), label=r'$\dot{Q}_{\mathrm{Umwelt}}$')
+ax1a.plot(x_values, [avionics_power]*len(x_values), color='orange', linestyle='--', label=r'$\dot{Q}_{\mathrm{Avionik}}$')
+ax1a.plot(x_values, [hybrid_radiator_power]*len(x_values), color='red', linestyle='--', label=r'$\dot{Q}_{\mathrm{Radiator}}$')
+ax1a.plot(x_values, Qdot_in, color='blue', linestyle='-', label=r'$\dot{Q}_{\mathrm{Rein}}$')
+ax1a.fill_between(
+    x_values, hybrid_radiator_power, Qdot_in,
+    where=(Qdot_in > hybrid_radiator_power),
+    facecolor='lightgrey',
+    hatch='//',
+    edgecolor='black',
+    alpha=0.5,
+    label='PCM\nSchmelz-\nbereich'
+)
+ax1a.set_xlabel('Zeit [s]')
+ax1a.set_ylabel(r'W\"armestrom [W]')
+ax1a.legend()
+x1, x2, y1, y2 = 0, 125, 0, 100
+axins = ax1a.inset_axes([0.2, 0.4, 0.5, 0.5])
+axins.set_xlim(x1, x2)
+axins.set_ylim(y1, y2)
+axins.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)))
+axins.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='--')
+axins.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--')
+axins.plot(x_values, Qdot_in, color='blue', linestyle='-')
+axins.fill_between(
+    x_values, hybrid_radiator_power, Qdot_in,
+    where=(Qdot_in > hybrid_radiator_power),
+    facecolor='lightgrey',
+    hatch='//',
+    edgecolor='black',
+    alpha=0.5
+)
+mark_inset(ax1a, axins, loc1=2, loc2=4, fc="none", ec="0.5")
+if DEVELOPMENT_MODE:
+    ax1a.set_title("PCM W\"armestrom (ohne Simulation)")
+else:
+    fig1a.savefig("pcm_radiator_hybrid_heatflux_nosim.pdf", bbox_inches="tight")
+
 
 fig1, ax1 = plt.subplots(constrained_layout=True)
 
-# Main heat flow curves
+# Main heat flow curves with simulation data
 ax1.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)), label=r'$\dot{Q}_{\mathrm{Umwelt}}$')
 ax1.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='--', label=r'$\dot{Q}_{\mathrm{Avionik}}$')
 ax1.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--', label=r'$\dot{Q}_{\mathrm{Radiator}}$')
 ax1.plot(x_values, Qdot_in, color='blue', linestyle='-', label=r'$\dot{Q}_{\mathrm{Rein}}$')
-ax1.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
-ax1.plot(18.691, (34567.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-10s}}$')
-ax1.plot(38.691, (72349.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+10s}}$')
-ax1.plot(48.7, (21479.6*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+20s}}$')
-ax1.plot(x_values, gauss_fitted, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, Gauss-Fit}}$')
+ax1.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Sim}}$')
+ax1.plot(18.691, (34567.9*hybrid_radiator_area), color='red',marker='o')
+ax1.plot(38.691, (72349.2*hybrid_radiator_area), color='red',marker='o')
+ax1.plot(48.7, (21479.6*hybrid_radiator_area), color='red',marker='o')
+ax1.plot(x_values, gauss_fitted, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Sim-Fit}}$')
 
 # PCM melting range
 ax1.fill_between(
@@ -178,11 +218,11 @@ axins.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)))
 axins.plot(x_values, [avionics_power] * len(x_values), color='orange', linestyle='--')
 axins.plot(x_values, [hybrid_radiator_power] * len(x_values), color='red', linestyle='--')
 axins.plot(x_values, Qdot_in, color='blue', linestyle='-')
-axins.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax}}$')
-axins.plot(18.691, (34567.9*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax-10s}}$')
-axins.plot(38.691, (72349.2*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+10s}}$')
-axins.plot(48.7, (21479.6*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Qmax+20s}}$')
-axins.plot(x_values, gauss_fitted, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Rein, Gauss-Fit}}$')
+axins.plot(28.691, (67706.8*hybrid_radiator_area), color='red',marker='o', label=r'$\dot{Q}_{\mathrm{Sim}}$')
+axins.plot(18.691, (34567.9*hybrid_radiator_area), color='red',marker='o')
+axins.plot(38.691, (72349.2*hybrid_radiator_area), color='red',marker='o')
+axins.plot(48.7, (21479.6*hybrid_radiator_area), color='red',marker='o')
+axins.plot(x_values, gauss_fitted, color='green', linestyle='-.', label=r'$\dot{Q}_{\mathrm{Sim-Fit}}$')
 
 axins.fill_between(
     x_values, hybrid_radiator_power, Qdot_in,
@@ -202,7 +242,7 @@ if DEVELOPMENT_MODE:
     ax1.set_title("PCM Wärmestrom")
     print(f"Fitted Gaussian parameters:\na={popt[0]:.2f}, b={popt[1]:.2f}, c={popt[2]:.2f}, d={popt[3]:.2f}")
 else:
-    fig1.savefig("pcm_radiator_hybrid_heatflux_during_flight.pdf", bbox_inches="tight")
+    fig1.savefig("pcm_radiator_hybrid_heatflux_with_sim.pdf", bbox_inches="tight")
 
 # === PLOTTING FLUID NUMBERS ===
 fig2, ax2 = plt.subplots(constrained_layout=True)
@@ -252,6 +292,42 @@ if DEVELOPMENT_MODE:
     print(f"Maximum Dynamic Pressure: {max_value} at x = {max_x}")
 else:
     fig2.savefig("dynp_during_flight.pdf", bbox_inches="tight")
+
+# === PLOT: ALTITUDE OVER TIME ===
+fig4, ax4 = plt.subplots(constrained_layout=True)
+ax4.plot(time, raw['altitude'], color='navy')
+ax4.set_xlabel("Zeit [s]")
+ax4.set_ylabel("Höhe [m]")
+ax4.set_title("Flug Höhe" if DEVELOPMENT_MODE else "")
+if not DEVELOPMENT_MODE:
+    fig4.savefig("altitude_over_time.pdf", bbox_inches="tight")
+
+# === PLOT: VELOCITY OVER TIME ===
+fig5, ax5 = plt.subplots(constrained_layout=True)
+ax5.plot(time, velocity, color='darkgreen')
+ax5.set_xlabel("Zeit [s]")
+ax5.set_ylabel("Geschwindigkeit [m/s]")
+ax5.set_title("Flug Geschwindigkeit" if DEVELOPMENT_MODE else "")
+if not DEVELOPMENT_MODE:
+    fig5.savefig("velocity_over_time.pdf", bbox_inches="tight")
+
+# === PLOT: PRESSURE OVER TIME ===
+fig6, ax6 = plt.subplots(constrained_layout=True)
+ax6.plot(time, air_pressure, color='purple')
+ax6.set_xlabel("Zeit [s]")
+ax6.set_ylabel("Luftdruck [Pa]")
+ax6.set_title("Flug Luftdruck" if DEVELOPMENT_MODE else "")
+if not DEVELOPMENT_MODE:
+    fig6.savefig("pressure_over_time.pdf", bbox_inches="tight")
+
+# === PLOT: TEMPERATURE OVER TIME ===
+fig7, ax7 = plt.subplots(constrained_layout=True)
+ax7.plot(time, air_temperature, color='firebrick')
+ax7.set_xlabel("Zeit [s]")
+ax7.set_ylabel("Temperatur [K]")
+ax7.set_title("Flug Lufttemperatur" if DEVELOPMENT_MODE else "")
+if not DEVELOPMENT_MODE:
+    fig7.savefig("temperature_over_time.pdf", bbox_inches="tight")
 
 # === CALCULATE PCM CAPACITY REQUIREMENT ===
 mask = gauss_fitted > hybrid_radiator_power
