@@ -1,7 +1,6 @@
 //Modified UDF of the original source: https://akamcae.com/tutorials/phase-change-material-simulation-in-ansys-fluent/
 #include "udf.h"
 #include "mem.h"
-#include "acc_profile_array.c"
 
 //n-eicosane constant properties in solid phase
 #define Ros_pcm 910.0 //Nazarychev-2022
@@ -76,36 +75,23 @@ DEFINE_PROPERTY(Mu_var_PCM,cell,thread)
 }
 
 //Z-momentum source
-DEFINE_SOURCE(Boussinesq_momentum_source, cell, thread, dS, eqn)
+DEFINE_SOURCE(Boussinesq_momentum_source,cell,thread,dS,eqn)
 {
-    double Temp = C_T(cell, thread);
-    double acc = 9.81;  // default fallback
+	double Temp, source, acc;
+	Temp=C_T(cell,thread);
 
-    // Get current simulation time
-    real current_time = CURRENT_TIME;
+	double t = CURRENT_TIME;
 
-    // Look up acceleration using linear interpolation
-    int i;
-    for (i = 0; i < NUM_ACC_POINTS - 1; ++i) {
-        if (current_time >= acc_profile[i][0] && current_time <= acc_profile[i + 1][0]) {
-            double t1 = acc_profile[i][0];
-            double t2 = acc_profile[i + 1][0];
-            double a1 = acc_profile[i][1];
-            double a2 = acc_profile[i + 1][1];
+	if (t < 20)
+		acc = 34.81;
+	else if (t < 50)
+		acc = 109.81;
+	else if (t < 150)
+		acc = 19.62;
+	else
+		acc = 9.81;
 
-            // Linear interpolation
-            acc = a1 + (a2 - a1) * (current_time - t1) / (t2 - t1);
-            break;
-        }
-    }
-
-    // If outside range, use last known value
-    if (current_time > acc_profile[NUM_ACC_POINTS - 1][0]) {
-        acc = acc_profile[NUM_ACC_POINTS - 1][1];
-    }
-
-    double source = -Rol_pcm * acc * TEC * (Temp - Tr);
-    dS[eqn] = -Rol_pcm * acc * TEC;
-
-    return source;
+	source=-Rol_pcm*acc*TEC*(Temp-Tr); //negative for -Y down
+	dS[eqn]=-Rol_pcm*acc*TEC; //negative for -Y down
+	return source;
 }

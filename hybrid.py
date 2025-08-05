@@ -64,6 +64,7 @@ if missing_fields:
 time = raw['time']  # [s]
 velocity = raw['velocity']  # [m/s]
 air_temperature = raw['air_temperature'] + 273.15  # [K]
+acceleration = raw['acceleration']
 air_pressure = raw['air_pressure'] * 100 # [Pa]
 
 # === MATPLOTLIB STYLE ===
@@ -211,7 +212,7 @@ ax1.fill_between(
 
 # Inset zoom
 x1, x2, y1, y2 = 0, 60, 0, 7500
-axins = ax1.inset_axes([0.2, 0.4, 0.5, 0.5])
+axins = ax1.inset_axes([0.2, 0.3, 0.4, 0.6])
 axins.set_xlim(x1, x2)
 axins.set_ylim(y1, y2)
 axins.plot(x_values, Qdot_env, color='blue', linestyle=(0, (1, 5)))
@@ -291,7 +292,7 @@ if DEVELOPMENT_MODE:
     max_x = x_values[max_index]
     print(f"Maximum Dynamic Pressure: {max_value} at x = {max_x}")
 else:
-    fig2.savefig("dynp_during_flight.pdf", bbox_inches="tight")
+    fig3.savefig("dynp_during_flight.pdf", bbox_inches="tight")
 
 # === PLOT: ALTITUDE OVER TIME ===
 fig4, ax4 = plt.subplots(constrained_layout=True)
@@ -328,6 +329,15 @@ ax7.set_ylabel("Temperatur [K]")
 ax7.set_title("Flug Lufttemperatur" if DEVELOPMENT_MODE else "")
 if not DEVELOPMENT_MODE:
     fig7.savefig("temperature_over_time.pdf", bbox_inches="tight")
+
+# === PLOT: ACCELERATION OVER TIME ===
+fig8, ax8 = plt.subplots(constrained_layout=True)
+ax8.plot(time, acceleration, color='darkkhaki')
+ax8.set_xlabel("Zeit [s]")
+ax8.set_ylabel(r"Beschleunigung [$\mathrm{m/s^2}$]")
+ax8.set_title("Flug Beschleunigung" if DEVELOPMENT_MODE else "")
+if not DEVELOPMENT_MODE:
+    fig8.savefig("acceleration_over_time.pdf", bbox_inches="tight")
 
 # === CALCULATE PCM CAPACITY REQUIREMENT ===
 mask = gauss_fitted > hybrid_radiator_power
