@@ -1,8 +1,2 @@
-/mass_fixed_heat_contour.pdf
-/mass_vs_geometry_fixed_heat.pdf
-/pcm_heat_capacity.pdf
-/pcm_mass.pdf
-/pcm_radiator_hybrid_heatflux_during_flight.pdf
-/radiator_leistung.pdf
-/re_pr_during_flight.pdf
-results/
+/cluster
+*.pdf
