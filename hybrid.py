@@ -339,6 +339,29 @@ ax8.set_title("Flug Beschleunigung" if DEVELOPMENT_MODE else "")
 if not DEVELOPMENT_MODE:
     fig8.savefig("acceleration_over_time.pdf", bbox_inches="tight")
 
+# === APPROXIMATED ACCELERATION FROM UDF ===
+acc_udf = np.zeros_like(time)
+for i, t in enumerate(time):
+    if t < 20:
+        acc_udf[i] = 34.81
+    elif t < 50:
+        acc_udf[i] = 109.81
+    elif t < 150:
+        acc_udf[i] = 19.62
+    else:
+        acc_udf[i] = 9.81
+
+fig9, ax9 = plt.subplots(constrained_layout=True)
+ax9.plot(time, acc_udf, color='darkred', label='Approximierte Beschleunigung')
+ax9.set_xlabel("Zeit [s]")
+ax9.set_ylabel(r"Beschleunigung [$\mathrm{m/s^2}$]")
+ax9.set_title("Approximierte Beschleunigung" if DEVELOPMENT_MODE else "")
+ax9.legend()
+
+if not DEVELOPMENT_MODE:
+    fig9.savefig("approximate_acceleration_over_time.pdf", bbox_inches="tight")
+
+
 # === CALCULATE PCM CAPACITY REQUIREMENT ===
 mask = gauss_fitted > hybrid_radiator_power
 y_diff_hybrid = gauss_fitted[mask] - hybrid_radiator_power
