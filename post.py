@@ -100,10 +100,10 @@ else:
 # hull yplus plots
 fig2, ax2 = plt.subplots(constrained_layout=True)
 
-ax2.plot(x_values, maxQm10yplus, color='black', linestyle='-', label=r'$\dot{q}_{\mathrm{max Q - 10 s}}$')
-ax2.plot(x_values, maxQyplus, color='dimgrey', linestyle='-', label=r'$\dot{q}_{\mathrm{max Q}}$')
-ax2.plot(x_values, maxQp10yplus, color='darkgrey', linestyle='-', label=r'$\dot{q}_{\mathrm{max Q + 10 s}}$')
-ax2.plot(x_values, maxQp20yplus, color='lightgrey', linestyle='-', label=r'$\dot{q}_{\mathrm{max Q + 20 s}}$')
+ax2.plot(x_values, maxQm10yplus, color='black', linestyle='-', label=r'$y+_{\mathrm{max Q - 10 s}}$')
+ax2.plot(x_values, maxQyplus, color='dimgrey', linestyle='-', label=r'$y+_{\mathrm{max Q}}$')
+ax2.plot(x_values, maxQp10yplus, color='darkgrey', linestyle='-', label=r'$y+_{\mathrm{max Q + 10 s}}$')
+ax2.plot(x_values, maxQp20yplus, color='lightgrey', linestyle='-', label=r'$y+_{\mathrm{max Q + 20 s}}$')
 
 ax2.set_xlabel('Position [m]')
 ax2.set_ylabel('y+')
