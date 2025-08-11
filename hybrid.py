@@ -362,17 +362,28 @@ if not DEVELOPMENT_MODE:
     fig9.savefig("approximate_acceleration_over_time.pdf", bbox_inches="tight")
 
 
-# === CALCULATE PCM CAPACITY REQUIREMENT ===
+# calculate simulation fit capacity result
 mask = gauss_fitted > hybrid_radiator_power
-y_diff_hybrid = gauss_fitted[mask] - hybrid_radiator_power
-x_limits = x_values[mask]
-y_diff_pcm = avionics_power
-hybrid_capacity_target = np.trapezoid(y_diff_hybrid, x_limits)  # hybrid Energy integral [J]
-pcm_capacity_target = avionics_power * 1400                     # normal pcm energy requirement
+x_sim = x_values[mask]
+y_sim = gauss_fitted[mask] - hybrid_radiator_power
+hybrid_capacity_sim = float(np.trapezoid(y_sim, x_sim)) if x_sim.size else 0.0  # [J]
+
+# calculate nusselt capacity result
+mask_nu = Qdot_in > hybrid_radiator_power
+x_nu = x_values[mask_nu]
+y_nu = Qdot_in[mask_nu] - hybrid_radiator_power
+hybrid_capacity_nu = float(np.trapezoid(y_nu, x_nu)) if x_nu.size else 0.0      # [J]
+
+# simple PCM energy budget (constant duration)
+pcm_capacity = float(avionics_power * 1200)  # [J]
 
 # Append result
-result_data["hybrid_capacity_target"] = hybrid_capacity_target
-result_data["pcm_capacity_target"] = pcm_capacity_target
+result_data.update({
+    "hybrid_capacity_sim": hybrid_capacity_sim,
+    "hybrid_capacity_nu": hybrid_capacity_nu,
+    "pcm_capacity": pcm_capacity,
+})
+
 with open("result.json", "w") as f:
     json.dump(result_data, f, indent=4)
 
