@@ -59,10 +59,9 @@ def total_mass(L, H):
             + (F * rho_alu + (1 - F) * rho_pcm) * (L - 2*h)**2 * (H - 2*h))
 
 def total_heat(L, H):
-    alu_heat  = rho_alu * (L**2 * H - (L - 2*h)**2 * (H - 2*h)) * cp_alu * dT
-    alu_void  = F * rho_alu * (L - 2*h)**2 * (H - 2*h) * cp_alu * dT
-    pcm_heat  = (1 - F) * rho_pcm * (L - 2*h)**2 * (H - 2*h) * (cp_pcm * dT + dH)
-    return alu_heat + alu_void + pcm_heat
+    #...#
+    pcm_heat  = (1 - F) * rho_pcm * (L - 2*h)**2 * (H - 2*h) * (cp_pcm * dT + dH)   # pcm latent heat capacity
+    return pcm_heat
 
 # === GRID CALCULATIONS ===
 L_vals, H_vals = np.meshgrid(np.linspace(2*h, 0.1, 100), np.linspace(2*h, 0.05, 100))
