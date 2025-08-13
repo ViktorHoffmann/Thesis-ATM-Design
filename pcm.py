@@ -45,22 +45,19 @@ mpl.rcParams.update({
 })
 
 # === CONSTANTS ===
-rho_alu = 2700  # [kg*m^-3]
-cp_alu  = 896   # [J*kg^-1*K^-1]
-rho_pcm = 788   # [kg*m^-3]
-cp_pcm  = 2950  # [J*kg^-1*K^-1]
-dT      = 0.001 # [K]
-dH      = 266000 # [J*kg^-1]
-F       = 0.1   # void fraction
-h       = 0.001 # wall thickness
+rho_alu = 2700     # aluminium density [kg*m^-3]
+rho_pcm = 788      # pcm density [kg*m^-3]
+dH      = 240998.9 # pcm latent heat [J*kg^-1]
+F       = 0.1      # void fraction
+h       = 0.001    # wall thickness [m]
 
-def total_mass(L, H):
+def total_mass(L, H): # pcm mass including case and fins
     return (rho_alu * (L**2 * H - (L - 2*h)**2 * (H - 2*h))
-            + (F * rho_alu + (1 - F) * rho_pcm) * (L - 2*h)**2 * (H - 2*h))
+            + (F * rho_alu + (1 - F) * rho_pcm) * (L - 2*h)**2 * (H - 2*h)) 
 
-def total_heat(L, H):
+def total_heat(L, H): # pcm latent heat capacity
     #...#
-    pcm_heat  = (1 - F) * rho_pcm * (L - 2*h)**2 * (H - 2*h) * (cp_pcm * dT + dH)   # pcm latent heat capacity
+    pcm_heat  = (1 - F) * rho_pcm * (L - 2*h)**2 * (H - 2*h) * dH
     return pcm_heat
 
 # === GRID CALCULATIONS ===
