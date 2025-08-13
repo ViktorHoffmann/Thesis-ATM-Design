@@ -50,7 +50,7 @@ cp_alu  = 896   # [J*kg^-1*K^-1]
 rho_pcm = 788   # [kg*m^-3]
 cp_pcm  = 2950  # [J*kg^-1*K^-1]
 dT      = 0.001 # [K]
-dH      = 266000 # [J*kg^-1]
+dH      = 240998.9 # [J*kg^-1]
 F       = 0.1   # void fraction
 h       = 0.001 # wall thickness
 
