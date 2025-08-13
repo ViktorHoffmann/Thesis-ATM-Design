@@ -3,25 +3,24 @@
 #include "mem.h"
 
 //n-eicosane constant properties in solid phase
-#define Ros_pcm 910.0 //Nazarychev-2022
-#define Cps_pcm 2132.4 //NIST
-#define Ks_pcm 0.4248 //Stryker-1990
+#define Ros_pcm 910.0
+#define Cps_pcm 2132.4
+#define Ks_pcm 0.4248
 
 //n-eicosane constant properties in fluid phase
-#define Rol_pcm 769.0 //Nazarychev-2022
-#define Cpl_pcm 2350.05 //NIST
-#define Kl_pcm 0.1505 //Benbrika-2020
+#define Rol_pcm 769.0
+#define Cpl_pcm 2350.05
+#define Kl_pcm 0.1505
 
 //thermal expansion coefficient
-#define TEC 0.0009 //Benbrika-2020
+#define TEC 0.0009
 
 //solidus and liquidus temperatures of n-eicosane
-#define Ts 309.0 //NIST
-#define Tl 311.0 //NIST
+#define Ts 309.0
+#define Tl 311.0
 
 //reference temperature for Boussinesq's approximation
-#define Tr 310.0
-//please set the Tref in Fluent like Tr
+#define Tr 310.0		//Fluent Tref must be equal to Tr
 
 //density of PCM
 DEFINE_PROPERTY(Ro_var_PCM,cell,thread)
@@ -63,7 +62,7 @@ DEFINE_PROPERTY(K_var_PCM,cell,thread)
 	return K_pcm;
 }
 
-//dynamic viscosity of PCM 
+//dynamic viscosity of PCM with fit
 DEFINE_PROPERTY(Mu_var_PCM,cell,thread)
 {
 	double Temp,Mu_pcm;
@@ -74,7 +73,9 @@ DEFINE_PROPERTY(Mu_var_PCM,cell,thread)
 	return Mu_pcm;
 }
 
-//Z-momentum source
+/*...*/
+
+//Y-momentum source
 DEFINE_SOURCE(Boussinesq_momentum_source,cell,thread,dS,eqn)
 {
 	double Temp, source, acc;
@@ -91,7 +92,7 @@ DEFINE_SOURCE(Boussinesq_momentum_source,cell,thread,dS,eqn)
 	else
 		acc = 9.81;
 
-	source=-Rol_pcm*acc*TEC*(Temp-Tr); //negative for -Y down
-	dS[eqn]=-Rol_pcm*acc*TEC; //negative for -Y down
+	source=-Rol_pcm*acc*TEC*(Temp-Tr);  //negative for -Y down
+	dS[eqn]=-Rol_pcm*acc*TEC; 			//negative for -Y down
 	return source;
 }
