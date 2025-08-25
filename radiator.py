@@ -21,10 +21,10 @@ except json.JSONDecodeError:
     exit()
 
 DEVELOPMENT_MODE = data["devmode"]
-avionics_power = data["avionics_power"] # W
+avionics_power = data["avionics_power"]
 e = data["emittance"]
 a = data["absorptance"]
-solar_flux = data["solar_flux"] # W*m^-2
+solar_flux = data["solar_flux"]
 target_temperature = data["target_temperature"]
 
 # Set global matplotlib style
@@ -58,7 +58,10 @@ phi_radiation = (A_grid * e * Stefan_Boltzmann * T_K_grid**4) # [W]
 
 
 # === Target result ===
-hybrid_radiator_area = (avionics_power) / ((e * Stefan_Boltzmann * T_target**4)-(solar_flux/2)*a) # [m^2] necessary radiator area to get rid of avionics- and solarheatflux
+def radiator_area(avionics_power, target_temperature, e, a, solar_flux): # radiator area
+    return (avionics_power / (e * Stefan_Boltzmann * target_temperature**4 - 0.5 * solar_flux * a))
+
+
 hybrid_radiator_power = hybrid_radiator_area*e*Stefan_Boltzmann*T_target**4 # [W] total out-heatflux of radiator
 
 # Putting Data into result.json
