@@ -8,7 +8,7 @@ import matplotlib as mpl
 
 
 
-# === CONFIGURATION ===
+# === configuration ===
 # load data from setup.json
 try:
     with open("setup.json", "r") as f:
