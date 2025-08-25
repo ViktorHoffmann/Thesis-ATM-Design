@@ -1,13 +1,13 @@
 {
-    "hybrid_radiator_area": 0.09788296526474714,
-    "hybrid_radiator_power": 47.34122239485604,
-    "hybrid_capacity_sim": 184788.48395028105,
-    "hybrid_capacity_nu": 615025.5976126483,
+    "hybrid_radiator_area": 0.0996163285294786,
+    "hybrid_radiator_power": 47.471224639710904,
+    "hybrid_capacity_sim": 188087.64535959047,
+    "hybrid_capacity_nu": 626817.5705502237,
     "pcm_capacity": 48000.0,
-    "hybrid_H_sim": 0.013187865224260345,
-    "hybrid_m_sim": 1.624907333887284,
-    "hybrid_H_nu": 0.03923628055664778,
-    "hybrid_m_nu": 4.177485633510544,
+    "hybrid_H_sim": 0.013188203298524867,
+    "hybrid_m_sim": 1.6535028624398134,
+    "hybrid_H_nu": 0.03928567591747304,
+    "hybrid_m_nu": 4.255679378864365,
     "normal_L_solution": 0.06748627883089094,
     "normal_m_solution": 0.346609735620966
 }
