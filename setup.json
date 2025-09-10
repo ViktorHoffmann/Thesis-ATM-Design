@@ -1,7 +1,7 @@
 {
     "devmode": 0,
     "avionics_power": 40,
-    "target_temperature": 38,
+    "target_temperature": 36.85,
     "emittance": 0.91,
     "absorptance": 0.15,
     "solar_flux": 1000,
